@@ -3,6 +3,8 @@ Scope
 
 An oscilloscope in JavaScript using the Web Audio API and canvas.
 
+Tiny little demo available [here](http://kevincennis.github.io/Scope/).
+
 ---
 
 ## Usage
