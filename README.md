@@ -7,7 +7,7 @@ An oscilloscope in JavaScript using the Web Audio API and canvas.
 
 ## Usage
 
-```
+```js
 var canvas = document.querySelector('canvas'),
   ac = new AudioContext(),
   osc = ac.createOscillator(),
