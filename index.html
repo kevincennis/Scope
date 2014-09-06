@@ -1,0 +1,87 @@
+<!doctype>
+<html>
+  <head>
+
+    <meta charset="utf-8">
+
+    <script src="https://rawgit.com/kevincennis/Scope/gh-pages/dist/Scope.js"></script>
+
+    <style>
+
+      body {
+        padding: 120px;
+        font-family: Helvetica, Verdana, Arial, sans-serif;
+      }
+
+      canvas {
+        width: 600px;
+        height: 300px;
+        display: block;
+        margin: 0 auto;
+      }
+
+      p {
+        text-align: center;
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <canvas id="osc" width="600" height="300"></canvas>
+
+    <p>Stabilization sensitivity</p>
+
+    <p>
+      <input id="min" type="range" min="1" max="100" />
+      <label id="label" for="min"></label>
+    </p>
+
+    <script>
+
+      var ac = new AudioContext(),
+        canvas = document.querySelector('#osc'),
+        osc = ac.createOscillator(),
+        scope = new Scope( ac, canvas ),
+        slider = document.querySelector('#min'),
+        label = document.querySelector('#label'),
+        real, imag, wave;
+
+      function scale( val, f0, f1, t0, t1 ) {
+       return ( val - f0 ) * ( t1 - t0 ) / ( f1 - f0 ) + t0;
+      }
+
+      slider.value = scope.sensitivity;
+      label.textContent = ~~scope.sensitivity;
+
+      osc.connect( scope.input );
+      osc.connect( ac.destination );
+
+      osc.frequency.value = 440;
+
+      // each index (past 0) represents a partial in the harmonic series
+      // so index 1 is the fundamental, index 2 is an octave,
+      // index 3 is a perfect fifth, index 4 is another octave
+      // index 5 is a major third, etc...
+
+      // an array of [ 0, 1 ] would be a perfect sine wave
+      real = new Float32Array([ 0, -0.9, -0.6, -0.3, 0, 0.3, 0.6, 0.9, 1 ]);
+      imag = real;
+      wave = ac.createPeriodicWave( real, imag );
+      osc.setPeriodicWave( wave );
+
+      osc.start();
+      scope.start();
+
+      slider.addEventListener('input', function() {
+        scope.sensitivity = slider.value;
+        label.textContent = slider.value;
+      }, false );
+
+    </script>
+
+  </body>
+
+</html>
