@@ -58,6 +58,8 @@
       <label for="square">square</label>
       <input id="custom" type="radio" name="type" value="custom" checked>
       <label for="custom">custom</label>
+      <input id="microphone" type="radio" name="type" value="microphone">
+      <label for="microphone">microphone</label>
     </p>
 
     <script>
@@ -69,7 +71,7 @@
         slider = document.querySelector('#min'),
         label = document.querySelector('#label'),
         radios = document.querySelectorAll('input[type=radio]'),
-        real, imag, wave;
+        real, imag, wave, mic;
 
       function scale( val, f0, f1, t0, t1 ) {
        return ( val - f0 ) * ( t1 - t0 ) / ( f1 - f0 ) + t0;
@@ -104,14 +106,42 @@
 
       [].forEach.call( radios, function( radio ) {
         radio.addEventListener('click', function( ev ) {
-          console.log( 'hai' );
-          if ( ev.target.value !== 'custom' ) {
-            osc.type = ev.target.value;
-          } else {
+          osc.frequency.value = 440;
+          if ( ev.target.value === 'microphone' ) {
+            return microphone();
+          }
+          mic && mic.disconnect();
+          osc.connect( scope.input );
+          osc.connect( ac.destination );
+          if ( ev.target.value === 'custom' ) {
             osc.setPeriodicWave( wave );
+          } else {
+            osc.type = ev.target.value;
           }
         });
       });
+
+      function microphone() {
+        osc.disconnect();
+        if ( mic ) {
+          mic.connect( scope.input );
+          return;
+        }
+        function success( stream ) {
+          mic = ac.createMediaStreamSource( stream );
+          mic.connect( scope.input );
+        }
+        function error() {}
+        if ( navigator.webkitGetUserMedia ) {
+          navigator.webkitGetUserMedia({ audio: true }, success, error );
+        } else if ( navigator.mozGetUserMedia ) {
+          navigator.mozGetUserMedia({ audio: true }, success, error );
+        } else if ( navigator.getUserMedia ) {
+          navigator.getUserMedia({ audio: true }, success, error );
+        } else {
+          alert('Microphone access not supported by your browser. Try Chrome');
+        }
+      }
 
     </script>
 
