@@ -24,6 +24,10 @@
         text-align: center;
       }
 
+      input, label {
+        cursor: pointer;
+      }
+
     </style>
 
   </head>
@@ -39,6 +43,23 @@
       <label id="label" for="min"></label>
     </p>
 
+    <br>
+
+    <p>Wave type</p>
+
+    <p>
+      <input id="sine" type="radio" name="type" value="sine">
+      <label for="sine">sine</label>
+      <input id="triangle" type="radio" name="type" value="triangle">
+      <label for="triangle">triangle</label>
+      <input id="sawtooth" type="radio" name="type" value="sawtooth">
+      <label for="sawtooth">sawtooth</label>
+      <input id="square" type="radio" name="type" value="square">
+      <label for="square">square</label>
+      <input id="custom" type="radio" name="type" value="custom" checked>
+      <label for="custom">custom</label>
+    </p>
+
     <script>
 
       var ac = new AudioContext(),
@@ -47,6 +68,7 @@
         scope = new Scope( ac, canvas ),
         slider = document.querySelector('#min'),
         label = document.querySelector('#label'),
+        radios = document.querySelectorAll('input[type=radio]'),
         real, imag, wave;
 
       function scale( val, f0, f1, t0, t1 ) {
@@ -79,6 +101,17 @@
         scope.sensitivity = slider.value;
         label.textContent = slider.value;
       }, false );
+
+      [].forEach.call( radios, function( radio ) {
+        radio.addEventListener('click', function( ev ) {
+          console.log( 'hai' );
+          if ( ev.target.value !== 'custom' ) {
+            osc.type = ev.target.value;
+          } else {
+            osc.setPeriodicWave( wave );
+          }
+        });
+      });
 
     </script>
 
